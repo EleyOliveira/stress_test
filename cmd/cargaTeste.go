@@ -46,7 +46,7 @@ func init() {
 }
 
 func TesteCarga(cmd *cobra.Command, args []string) {
-	fmt.Println("cargaTeste called")
+
 	requests, err := cmd.Flags().GetInt("requests")
 	if err != nil {
 		fmt.Println("Erro ao obter a quantidade de requisições:", err)
@@ -77,9 +77,6 @@ func TesteCarga(cmd *cobra.Command, args []string) {
 	}
 
 	criarRequisicoes(parsedUrl, requests, concurrency)
-	fmt.Printf("URL: %s\n", parsedUrl)
-	fmt.Printf("Concorrência: %d\n", concurrency)
-	fmt.Printf("Requisições %d\n", requests)
 }
 
 func criarRequisicoes(url *url.URL, requests int, concurrency int) {
@@ -119,17 +116,21 @@ func criarRequisicoes(url *url.URL, requests int, concurrency int) {
 	}
 	wg.Wait()
 	tempoDecorrido := time.Since(startTime)
-	formatarRelatorio(statusCodes, tempoDecorrido)
+	formatarRelatorio(statusCodes, tempoDecorrido, url, concurrency, requests)
 }
 
-func formatarRelatorio(statusCodes map[int]int, tempoDecorrido time.Duration) {
+func formatarRelatorio(statusCodes map[int]int, tempoDecorrido time.Duration, parsedUrl *url.URL, concurrency int, requests int) {
+
+	fmt.Printf("URL: %s\n", parsedUrl)
+	fmt.Printf("Concorrência: %d\n", concurrency)
+	fmt.Printf("Requisições: %d\n", requests)
 	fmt.Println("Tempo decorrido: ", tempoDecorrido)
 
 	for status, quantidade := range statusCodes {
 		if status == -1 {
-			fmt.Printf("Erros: %d\n", quantidade)
+			fmt.Printf("Quantidade de erros: %d\n", quantidade)
 		} else {
-			fmt.Printf("Status %d: %d\n", status, quantidade)
+			fmt.Printf("Quantidade de requisições com StatusCode %d: %d\n", status, quantidade)
 		}
 	}
 }
