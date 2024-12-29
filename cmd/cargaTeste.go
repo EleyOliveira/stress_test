@@ -2,7 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
+	"sync"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -72,7 +75,38 @@ func TesteCarga(cmd *cobra.Command, args []string) {
 		fmt.Println("A quantidade de requisições concorrentes deve ser maior que zero")
 		return
 	}
+
+	criarRequisicoes(parsedUrl, requests, concurrency)
 	fmt.Printf("URL: %s\n", parsedUrl)
 	fmt.Printf("Concorrência: %d\n", concurrency)
 	fmt.Printf("Requisições %d\n", requests)
+}
+
+func criarRequisicoes(url *url.URL, requests int, concurrency int) {
+	startTime := time.Now()
+
+	var wg sync.WaitGroup
+	chlimite := make(chan struct{}, concurrency)
+
+	for i := 0; i < requests; i++ {
+		wg.Add(1)
+		chlimite <- struct{}{}
+
+		go func() {
+			defer wg.Done()
+			defer func() { <-chlimite }()
+
+			resp, err := http.Get(url.String())
+			if err != nil {
+				fmt.Println("Erro ao fazer a requisição:", err)
+				return
+			}
+			defer resp.Body.Close()
+			fmt.Println("Resposta:", resp.Status)
+		}()
+	}
+	wg.Wait()
+	tempoDecorrido := time.Since(startTime)
+	fmt.Println(tempoDecorrido)
+
 }
