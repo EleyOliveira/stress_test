@@ -88,6 +88,9 @@ func criarRequisicoes(url *url.URL, requests int, concurrency int) {
 	var wg sync.WaitGroup
 	chlimite := make(chan struct{}, concurrency)
 
+	statusCodes := make(map[int]int)
+	var mutex sync.Mutex
+
 	for i := 0; i < requests; i++ {
 		wg.Add(1)
 		chlimite <- struct{}{}
@@ -99,14 +102,34 @@ func criarRequisicoes(url *url.URL, requests int, concurrency int) {
 			resp, err := http.Get(url.String())
 			if err != nil {
 				fmt.Println("Erro ao fazer a requisição:", err)
+
+				mutex.Lock()
+				statusCodes[-1]++
+				mutex.Unlock()
+
 				return
 			}
 			defer resp.Body.Close()
-			fmt.Println("Resposta:", resp.Status)
+
+			mutex.Lock()
+			statusCodes[resp.StatusCode]++
+			mutex.Unlock()
+
 		}()
 	}
 	wg.Wait()
 	tempoDecorrido := time.Since(startTime)
-	fmt.Println(tempoDecorrido)
+	formatarRelatorio(statusCodes, tempoDecorrido)
+}
 
+func formatarRelatorio(statusCodes map[int]int, tempoDecorrido time.Duration) {
+	fmt.Println("Tempo decorrido: ", tempoDecorrido)
+
+	for status, quantidade := range statusCodes {
+		if status == -1 {
+			fmt.Printf("Erros: %d\n", quantidade)
+		} else {
+			fmt.Printf("Status %d: %d\n", status, quantidade)
+		}
+	}
 }
