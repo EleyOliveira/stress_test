@@ -1,38 +1,23 @@
-# My CLI Project
+# Testes de stress
 
-This project is a command-line interface (CLI) application built with Go. It utilizes the Cobra library for command management and provides utility functions for handling input and output.
+Este projeto é uma apllicação command-line interface (CLI) desenvolvida em Go para realização de testes de stress que utiliza a biblioteca Cobra.
 
-## Installation
+## Flags
 
-To install the CLI application, clone the repository and navigate to the project directory:
+-  -u, --url: Uma string que representa a URL para onde serão enviadas as requisições.
+-  -r, --requests: Valor inteiro que representa a quantidade de requisições a serem realizadas. Senão for informado será utilizado o valor padrão de 1. 
+-  -c, --concurrency: Valor inteiro que representa a quantidade de requisições concorrentes. Senão for informado será utilizado o valor padrão de 1.
 
-```bash
-git clone <repository-url>
-cd my-cli-project
-```
 
-Then, build the application:
+## Utilização
 
-```bash
-go build -o my-cli-app ./cmd
-```
-
-## Usage
-
-After building the application, you can run it using:
+Crie uma imagem Docker com a seguinte instrução:
 
 ```bash
-./my-cli-app
+docker build -t nomeImagem
 ```
+Execute a imagem Docker em um container com a seguinte instrução:
 
-## Commands
-
-- `root`: The main command that provides various subcommands and flags.
-
-## Contributing
-
-Feel free to submit issues or pull requests to improve the project. 
-
-## License
-
-This project is licensed under the MIT License.
+```bash
+docker run nomeImagem -u "http://exemplo.com" -r 10 -c 10
+```
