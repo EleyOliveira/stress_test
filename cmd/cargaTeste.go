@@ -14,12 +14,9 @@ import (
 var cargaTesteCmd = &cobra.Command{
 	Use:   "cargateste",
 	Short: "Esse comando realiza um teste de carga",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `Esse comando permite que seja informada uma URL onde serão enviadas as requisições, o total de requisições
+	e a quantidade de requisições concorrentes.
+	Por exemplo: cargateste -u http://localhost:8020 -t 100 -c 10`,
 	Run: TesteCarga,
 }
 
@@ -31,18 +28,6 @@ func init() {
 	cargaTesteCmd.MarkFlagRequired("url")
 
 	cargaTesteCmd.Flags().IntP("concurrency", "c", 1, "Quantidade de requisições concorrentes")
-
-	//cargaTesteCmd.MarkFlagRequired("requests")
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// cargaTesteCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// cargaTesteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func TesteCarga(cmd *cobra.Command, args []string) {
